@@ -10,6 +10,19 @@
       {
         "command": "node .cursor/hooks/session-start.js"
       }
+    ],
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/ts-build-check.js",
+        "matcher": "Write"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "node .cursor/hooks/no-cloud-ai.js",
+        "matcher": "openai|anthropic|groq|gemini|cohere|replicate|together-ai|mistralai",
+        "failClosed": false
+      }
     ]
   }
 }

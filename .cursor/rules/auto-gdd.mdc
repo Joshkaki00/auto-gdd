@@ -1,35 +1,34 @@
 ---
-description: Auto-GDD project conventions — GDD structure, engine awareness, RAG usage, and Obsidian output format
-alwaysApply: false
+description: auto-gdd monorepo — architecture, conventions, and non-negotiable rules
+alwaysApply: true
 ---
 
-## Auto-GDD Project
+## auto-gdd monorepo
 
-This workspace is the **auto-gdd** monorepo — a local AI tool that generates Game Design Documents.
+Local AI GDD generator. Offline-only. Never add cloud API calls.
 
-### Packages
-- `packages/core` — shared engine: Ollama client, RAG pipeline (ChromaDB/vectra + BM25), GDD assembler, markdown writer
-- `packages/cli` — `npx auto-gdd` CLI with commander + inquirer
-- `packages/mcp` — MCP server (Stdio) exposing `gdd_generate`, `rag_index`, `rag_search`, `rag_list`, `models_list`
-- `packages/vscode` — VS Code/Cursor extension with sidebar webview
+### Package layout
+- `packages/core` — all shared logic (Ollama, RAG, GDD assembler). No CLI/UI deps.
+- `packages/cli` — `npx auto-gdd` terminal interface
+- `packages/mcp` — MCP server (Stdio) for Cursor/Claude/Windsurf
+- `packages/vscode` — VS Code/Cursor extension (CommonJS — required by VS Code API)
 
-### Key conventions
-- All packages are ESM (`"type": "module"`) except `packages/vscode` which uses CommonJS for VS Code compatibility
-- Import paths must use `.js` extensions (Node16 module resolution)
-- Config hierarchy: `~/.auto-gdd/config.json` (global) → `.auto-gdd.json` (workspace, takes precedence)
-- Engine detection happens in `WorkspaceDetector` by scanning signature files — never hard-code engine names
-- GDD sections are defined in `PromptTemplates.ts` — add new sections there, not inline
-- RAG vector store uses `vectra` (file-based, no server needed) — stored in `.auto-gdd-vectors/`
-- Obsidian output: YAML frontmatter + wikilinks when `--split` flag is used
+### Non-negotiable rules
+- **Offline only.** No `openai`, `anthropic`, `groq`, or any cloud AI SDK. Use `OllamaClient` in `packages/core/src/ollama/`.
+- **Build after every `.ts` edit.** A `postToolUse` hook runs `npm run build` automatically and surfaces errors.
+- **ESM everywhere except `packages/vscode`**, which must stay CommonJS for the VS Code extension API.
+- **Import paths must include `.js` extension** (Node16 module resolution). ESLint enforces this.
 
-### Adding a new game engine
-1. Add profile to `ENGINE_PROFILES` in `packages/core/src/engines/engineProfiles.ts`
-2. Add signature rule to `RULES` array in `packages/core/src/detector/WorkspaceDetector.ts`
-3. Update `workspace-open.js` hook to include the new detection logic
+### Where things live
+| Concern | File |
+|---------|------|
+| GDD section prompts | `packages/core/src/gdd/PromptTemplates.ts` |
+| Game engine profiles | `packages/core/src/engines/engineProfiles.ts` |
+| Engine auto-detection | `packages/core/src/detector/WorkspaceDetector.ts` |
+| Config read/write | `packages/core/src/config/ConfigStore.ts` |
+| Vector store | `.auto-gdd-vectors/` (vectra, file-based, no server) |
 
-### Testing locally
-```bash
-npm install
-npm run build
-cd packages/cli && node dist/index.js init
-```
+### Adding a new engine
+1. Add to `ENGINE_PROFILES` in `engineProfiles.ts`
+2. Add signature to `RULES` array in `WorkspaceDetector.ts`
+3. Add detection in `.cursor/hooks/workspace-open.js`

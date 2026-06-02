@@ -3,7 +3,7 @@
     "allow": [
       "Bash(npm install*)",
       "Bash(npm run build*)",
-      "Bash(npm run build:*)",
+      "Bash(npm run lint*)",
       "Bash(node packages/cli/dist/index.js*)",
       "Bash(node packages/mcp/dist/index.js*)",
       "Bash(npx auto-gdd*)",
@@ -13,16 +13,25 @@
       "Bash(git diff *)",
       "Bash(git log *)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(npm install*openai*)",
+      "Bash(npm install*anthropic*)",
+      "Bash(npm install*groq*)",
+      "Bash(npm install*@google/generative*)",
+      "Bash(npm install*cohere*)",
+      "Bash(npm install*mistralai*)",
+      "Bash(npm install*replicate*)",
+      "Bash(npm install*together-ai*)"
+    ]
   },
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"const f=process.env.CLAUDE_TOOL_FILE||''; if(f.endsWith('.ts')){console.log('TypeScript file edited — run: npm run build to verify')}\""
+            "command": "node -e \"const f=process.env.CLAUDE_TOOL_FILE||''; const path=require('path'); if(!f.endsWith('.ts')) process.exit(0); const pkg=f.replace(/\\\\\\\\/g,'/').match(/packages\\/([^\\/]+)\\//)?.[1]; const cmd=pkg?`npm run build --workspace=packages/${pkg}`:'npm run build'; const {execSync}=require('child_process'); try{execSync(cmd,{stdio:'pipe',timeout:90000}); console.log('✓ Build clean after editing '+path.basename(f));}catch(e){const out=(e.stdout+e.stderr).toString().split('\\n').filter(l=>l.includes('error')).slice(0,10).join('\\n'); console.log('⚠️ Build errors in '+path.basename(f)+':\\n'+out);}\""
           }
         ]
       }
