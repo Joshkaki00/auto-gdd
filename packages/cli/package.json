@@ -1,0 +1,28 @@
+{
+  "name": "auto-gdd",
+  "version": "0.1.0",
+  "description": "CLI for generating Game Design Documents with local AI",
+  "type": "module",
+  "bin": {
+    "auto-gdd": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@auto-gdd/core": "*",
+    "commander": "^12.0.0",
+    "inquirer": "^10.0.0",
+    "chalk": "^5.3.0",
+    "ora": "^8.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0",
+    "rimraf": "^6.0.0"
+  }
+}

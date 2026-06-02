@@ -1,0 +1,35 @@
+---
+description: Auto-GDD project conventions — GDD structure, engine awareness, RAG usage, and Obsidian output format
+alwaysApply: false
+---
+
+## Auto-GDD Project
+
+This workspace is the **auto-gdd** monorepo — a local AI tool that generates Game Design Documents.
+
+### Packages
+- `packages/core` — shared engine: Ollama client, RAG pipeline (ChromaDB/vectra + BM25), GDD assembler, markdown writer
+- `packages/cli` — `npx auto-gdd` CLI with commander + inquirer
+- `packages/mcp` — MCP server (Stdio) exposing `gdd_generate`, `rag_index`, `rag_search`, `rag_list`, `models_list`
+- `packages/vscode` — VS Code/Cursor extension with sidebar webview
+
+### Key conventions
+- All packages are ESM (`"type": "module"`) except `packages/vscode` which uses CommonJS for VS Code compatibility
+- Import paths must use `.js` extensions (Node16 module resolution)
+- Config hierarchy: `~/.auto-gdd/config.json` (global) → `.auto-gdd.json` (workspace, takes precedence)
+- Engine detection happens in `WorkspaceDetector` by scanning signature files — never hard-code engine names
+- GDD sections are defined in `PromptTemplates.ts` — add new sections there, not inline
+- RAG vector store uses `vectra` (file-based, no server needed) — stored in `.auto-gdd-vectors/`
+- Obsidian output: YAML frontmatter + wikilinks when `--split` flag is used
+
+### Adding a new game engine
+1. Add profile to `ENGINE_PROFILES` in `packages/core/src/engines/engineProfiles.ts`
+2. Add signature rule to `RULES` array in `packages/core/src/detector/WorkspaceDetector.ts`
+3. Update `workspace-open.js` hook to include the new detection logic
+
+### Testing locally
+```bash
+npm install
+npm run build
+cd packages/cli && node dist/index.js init
+```

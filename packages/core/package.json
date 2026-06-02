@@ -1,0 +1,29 @@
+{
+  "name": "@auto-gdd/core",
+  "version": "0.1.0",
+  "description": "Core GDD engine: Ollama client, RAG pipeline, workspace detector, GDD assembler",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "ollama": "^0.5.0",
+    "vectra": "^0.9.0",
+    "glob": "^11.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0",
+    "rimraf": "^6.0.0"
+  }
+}

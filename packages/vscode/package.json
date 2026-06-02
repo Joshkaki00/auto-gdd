@@ -1,0 +1,85 @@
+{
+  "name": "auto-gdd-vscode",
+  "displayName": "Auto-GDD",
+  "description": "Generate Game Design Documents with local AI — free, offline, Obsidian-ready",
+  "version": "0.1.0",
+  "publisher": "auto-gdd",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Other", "AI"],
+  "keywords": ["game design", "gdd", "ai", "ollama", "obsidian"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "auto-gdd.generate",
+        "title": "Auto-GDD: Generate GDD"
+      },
+      {
+        "command": "auto-gdd.init",
+        "title": "Auto-GDD: Initialize Workspace"
+      },
+      {
+        "command": "auto-gdd.indexReferences",
+        "title": "Auto-GDD: Index Reference Folder"
+      },
+      {
+        "command": "auto-gdd.redetectEngine",
+        "title": "Auto-GDD: Re-detect Engine"
+      },
+      {
+        "command": "auto-gdd.openPanel",
+        "title": "Auto-GDD: Open Panel"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [{
+        "id": "auto-gdd",
+        "title": "Auto-GDD",
+        "icon": "$(game)"
+      }]
+    },
+    "views": {
+      "auto-gdd": [{
+        "type": "webview",
+        "id": "auto-gdd.panel",
+        "name": "Game Design"
+      }]
+    },
+    "configuration": {
+      "title": "Auto-GDD",
+      "properties": {
+        "auto-gdd.ollamaUrl": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "Ollama server URL"
+        },
+        "auto-gdd.model": {
+          "type": "string",
+          "default": "phi4-mini",
+          "description": "Default LLM model"
+        },
+        "auto-gdd.embeddingModel": {
+          "type": "string",
+          "default": "nomic-embed-text",
+          "description": "Embedding model for RAG"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "package": "vsce package",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@auto-gdd/core": "*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.5.0",
+    "rimraf": "^6.0.0"
+  }
+}

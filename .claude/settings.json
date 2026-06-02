@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install*)",
+      "Bash(npm run build*)",
+      "Bash(npm run build:*)",
+      "Bash(node packages/cli/dist/index.js*)",
+      "Bash(node packages/mcp/dist/index.js*)",
+      "Bash(npx auto-gdd*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const f=process.env.CLAUDE_TOOL_FILE||''; if(f.endsWith('.ts')){console.log('TypeScript file edited — run: npm run build to verify')}\""
+          }
+        ]
+      }
+    ]
+  }
+}

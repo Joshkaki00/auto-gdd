@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "hooks": {
+    "workspaceOpen": [
+      {
+        "command": "node .cursor/hooks/workspace-open.js"
+      }
+    ],
+    "sessionStart": [
+      {
+        "command": "node .cursor/hooks/session-start.js"
+      }
+    ]
+  }
+}

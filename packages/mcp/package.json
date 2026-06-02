@@ -1,0 +1,25 @@
+{
+  "name": "auto-gdd-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for auto-GDD — use from Cursor, Claude Desktop, Windsurf",
+  "type": "module",
+  "bin": {
+    "auto-gdd-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@auto-gdd/core": "*",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0",
+    "rimraf": "^6.0.0"
+  }
+}

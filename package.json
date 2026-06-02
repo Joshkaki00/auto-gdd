@@ -1,0 +1,27 @@
+{
+  "name": "auto-gdd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local AI Game Design Document generator — free, offline, Obsidian-ready",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "build:core": "npm run build --workspace=packages/core",
+    "build:cli": "npm run build --workspace=packages/cli",
+    "build:mcp": "npm run build --workspace=packages/mcp",
+    "build:vscode": "npm run build --workspace=packages/vscode",
+    "dev:cli": "npm run dev --workspace=packages/cli",
+    "dev:mcp": "npm run dev --workspace=packages/mcp",
+    "typecheck": "tsc --noEmit -p tsconfig.base.json",
+    "clean": "npm run clean --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
