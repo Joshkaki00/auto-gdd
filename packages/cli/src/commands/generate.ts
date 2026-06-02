@@ -11,7 +11,6 @@ import {
   GDDAssembler,
   MarkdownWriter,
   GDD_SECTIONS,
-  EngineId,
   suggestEngine,
 } from '@auto-gdd/core';
 
@@ -63,7 +62,7 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
   const finalModel = flags.model ?? config.model ?? OllamaClient.recommendModel();
 
   // Engine detection
-  let engine = config.engine as EngineId | undefined;
+  let {engine} = config;
   if (!engine || engine === 'unknown') {
     const suggestion = suggestEngine(finalGenre, finalPlatform);
     if (suggestion) {
@@ -111,7 +110,10 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
   console.log(chalk.dim(`Model: ${finalModel} · Engine: ${engine} · Sections: ${GDD_SECTIONS.length}\n`));
 
   const assembler = new GDDAssembler(config.ollamaUrl);
-  let currentSection = '';
+  let sectionStartTime = Date.now();
+  let sectionTokenCount = 0;
+  let totalTokens = 0;
+  const totalStartTime = Date.now();
 
   const gdd = await assembler.assemble({
     gameName: finalName,
@@ -121,16 +123,37 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
     engine,
     model: finalModel,
     retriever,
-    onSectionStart: (key, title, i, total) => {
-      if (currentSection) process.stdout.write('\n');
-      currentSection = key;
-      console.log(chalk.bold.cyan(`\n[${i + 1}/${total}] ${title}`));
+    onSectionStart: (_key, title, i, total) => {
+      sectionStartTime = Date.now();
+      sectionTokenCount = 0;
+      const bar = chalk.dim('─'.repeat(50));
+      process.stdout.write(`\n${bar}\n`);
+      process.stdout.write(chalk.bold.cyan(`[${i + 1}/${total}] ${title}\n`));
+      process.stdout.write(bar + '\n');
     },
-    onToken: (token) => process.stdout.write(token),
-    onSectionEnd: () => {},
+    onToken: (token) => {
+      process.stdout.write(chalk.dim(token));
+      sectionTokenCount++;
+      totalTokens++;
+    },
+    onSectionEnd: (_key, content) => {
+      const elapsed = ((Date.now() - sectionStartTime) / 1000).toFixed(1);
+      const tokPerSec = sectionTokenCount > 0
+        ? (sectionTokenCount / ((Date.now() - sectionStartTime) / 1000)).toFixed(0)
+        : '—';
+      const words = content.trim().split(/\s+/).length;
+      process.stdout.write(
+        chalk.green(`\n✓ `) +
+        chalk.dim(`${words} words · ${elapsed}s · ${tokPerSec} tok/s\n`),
+      );
+    },
   });
 
-  process.stdout.write('\n');
+  const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(0);
+  process.stdout.write(
+    chalk.bold.green(`\n✓ All ${GDD_SECTIONS.length} sections complete`) +
+    chalk.dim(` (${totalTokens} tokens · ${totalElapsed}s)\n`),
+  );
 
   // Write output
   const writer = new MarkdownWriter();

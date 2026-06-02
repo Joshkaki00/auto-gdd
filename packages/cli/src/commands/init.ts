@@ -1,8 +1,8 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
-import { writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { writeFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   WorkspaceDetector,
   ConfigStore,
@@ -56,7 +56,7 @@ export async function runInit(cwd = process.cwd()): Promise<void> {
       type: 'input',
       name: 'platform',
       message: 'Target platform(s) (e.g. PC, Mobile, Web):',
-      default: ENGINE_PROFILES[result.engine as EngineId]?.defaultPlatforms.slice(0, 2).join(', ') ?? 'PC',
+      default: ENGINE_PROFILES[result.engine]?.defaultPlatforms.slice(0, 2).join(', ') ?? 'PC',
     },
     {
       type: 'input',

@@ -93,7 +93,7 @@ Include:
     key: 'story',
     title: 'Story & Characters',
     system: '',
-    prompt: ({ gameName, genre, concept, engine, ragContext }) => `
+    prompt: ({ gameName, genre, concept, engine: _engine, ragContext }) => `
 ${ragBlock(ragContext)}
 Write the **Story & Characters** section for "${gameName}" (${genre}).
 Concept: ${concept}

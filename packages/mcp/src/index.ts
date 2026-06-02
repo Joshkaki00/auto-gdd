@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -21,7 +20,7 @@ import {
   MarkdownWriter,
   GDD_SECTIONS,
   getProfile,
-  EngineId,
+  type EngineId,
 } from '@auto-gdd/core';
 
 const cwd = process.cwd();
@@ -35,7 +34,7 @@ const server = new Server(
       resources: {},
       prompts: {},
     },
-  }
+  },
 );
 
 // ─── Tools ────────────────────────────────────────────────────────────────────
@@ -125,13 +124,14 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
           }
         }
 
-        const engine = (config.engine ?? 'unknown') as EngineId;
+        const engine: EngineId = config.engine ?? 'unknown';
         const outputDir = path.resolve(cwd, config.outputPath ?? 'gdd');
 
         const sections: string[] = [];
+        const sectionPreviews: Record<string, string> = {};
         const assembler = new GDDAssembler(config.ollamaUrl);
+        const progressToken = `gdd_${Date.now()}`;
 
-        // Send progress notifications
         const gdd = await assembler.assemble({
           gameName: a.name,
           genre: a.genre,
@@ -141,13 +141,15 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
           model,
           retriever,
           onSectionStart: (_key, title, i, total) => {
-            // Notify progress (best-effort; MCP progress notifications)
             server.notification({
               method: 'notifications/progress',
-              params: { progressToken: `gdd_${Date.now()}`, progress: i, total, message: `Generating: ${title}` },
+              params: { progressToken, progress: i, total, message: `[${i + 1}/${total}] Generating: ${title}` },
             }).catch(() => {});
           },
-          onSectionEnd: (_key, content) => sections.push(content),
+          onSectionEnd: (key, content) => {
+            sections.push(content);
+            sectionPreviews[key] = content.slice(0, 200).replace(/\n/g, ' ').trim() + (content.length > 200 ? '…' : '');
+          },
         });
 
         const writer = new MarkdownWriter();
@@ -157,12 +159,19 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
         });
 
         const profile = getProfile(engine);
+        const previewLines = Object.entries(sectionPreviews)
+          .map(([key, preview]) => `**${key}**: ${preview}`)
+          .join('\n');
+
         const summary = [
           `✓ GDD generated for **${a.name}**`,
           `Engine: ${profile.displayName} | Genre: ${a.genre} | Platform: ${a.platform}`,
-          `Output: ${result.mainFile}`,
+          `Output: \`${result.mainFile}\``,
           a.split_sections ? `+ ${result.sectionFiles.length} section files` : '',
-        ].filter(Boolean).join('\n');
+          '',
+          '### Section previews',
+          previewLines,
+        ].filter(s => s !== undefined).join('\n');
 
         return { content: [{ type: 'text', text: summary }] };
       }
@@ -196,7 +205,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
         const retriever = new HybridRetriever(indexer.rawIndex, embedder);
         const results = await retriever.retrieve(a.query, a.top_k ?? 5);
         const text = results.map((r, i) =>
-          `[${i + 1}] ${r.source}${r.heading ? ` — ${r.heading}` : ''}\n${r.text.slice(0, 300)}`
+          `[${i + 1}] ${r.source}${r.heading ? ` — ${r.heading}` : ''}\n${r.text.slice(0, 300)}`,
         ).join('\n\n');
         return { content: [{ type: 'text', text: text || 'No results.' }] };
       }
@@ -335,7 +344,7 @@ async function main() {
   const detector = new WorkspaceDetector(cwd);
   const detection = detector.detect();
   if (detection.engine !== 'unknown' && !store.readWorkspace().engine) {
-    store.writeWorkspace({ engine: detection.engine as EngineId });
+    store.writeWorkspace({ engine: detection.engine });
   }
 
   const transport = new StdioServerTransport();

@@ -68,14 +68,14 @@ export class HybridRetriever {
           source: getMeta(item.metadata, 'source'),
           heading: getMeta(item.metadata, 'heading'),
           score: 0,
-        } as RetrievedChunk,
+        },
         tokens: this.tokenize(getMeta(item.metadata, 'text')),
       }));
 
       const avgDocLen = corpus.reduce((s, d) => s + d.tokens.length, 0) / corpus.length;
       const k1 = 1.5;
       const b = 0.75;
-      const scores: Array<{ chunk: RetrievedChunk; score: number }> = [];
+      const scores: { chunk: RetrievedChunk; score: number }[] = [];
 
       for (const doc of corpus) {
         let score = 0;
@@ -89,7 +89,7 @@ export class HybridRetriever {
         if (score > 0) scores.push({ chunk: doc.chunk, score });
       }
 
-      scores.sort((a, b) => b.score - a.score);
+      scores.sort((x, y) => y.score - x.score);
       return scores.slice(0, k).map(s => ({ ...s.chunk, score: s.score }));
     } catch {
       return [];
@@ -118,7 +118,7 @@ export class HybridRetriever {
       candidates.map(async c => {
         const vec = await this.embedder.embed(c.parentText || c.text);
         return { ...c, score: this.embedder.cosineSimilarity(queryVec, vec) };
-      })
+      }),
     );
     return scored.sort((a, b) => b.score - a.score);
   }

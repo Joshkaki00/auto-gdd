@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { LocalIndex } from 'vectra';
 import { EmbeddingClient } from '../ollama/EmbeddingClient.js';
-import { chunkMarkdown, Chunk } from './Chunker.js';
+import { chunkMarkdown } from './Chunker.js';
 
 export interface IndexedDoc {
   source: string;

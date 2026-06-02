@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import { GDDPanel } from './GDDPanel';
 import { ConfigStore, WorkspaceDetector, ENGINE_PROFILES } from '@auto-gdd/core';
-import path from 'node:path';
-import fs from 'node:fs';
 
 let panel: GDDPanel | undefined;
 
@@ -14,7 +12,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // Watch .auto-gdd.json for changes
   const configWatcher = vscode.workspace.createFileSystemWatcher(
-    new vscode.RelativePattern(workspaceRoot, '.auto-gdd.json')
+    new vscode.RelativePattern(workspaceRoot, '.auto-gdd.json'),
   );
   configWatcher.onDidChange(() => panel?.refresh());
   configWatcher.onDidCreate(() => panel?.refresh());
@@ -59,7 +57,7 @@ export function activate(context: vscode.ExtensionContext): void {
           if (view.visible) panel?.refresh();
         });
       },
-    })
+    }),
   );
 }
 
@@ -79,7 +77,7 @@ async function autoDetectEngine(root: string): Promise<void> {
     const name = ENGINE_PROFILES[result.engine].displayName;
     vscode.window.showInformationMessage(
       `Auto-GDD detected engine: ${name}. Run "Auto-GDD: Initialize Workspace" to complete setup.`,
-      'Initialize'
+      'Initialize',
     ).then(action => {
       if (action === 'Initialize') runInit(root);
     });

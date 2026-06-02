@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Command } from 'commander';
 import { runInit } from './commands/init.js';
 import { runGenerate } from './commands/generate.js';

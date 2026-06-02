@@ -160,12 +160,12 @@ export function getProfile(engine: EngineId): EngineProfile {
   return ENGINE_PROFILES[engine] ?? ENGINE_PROFILES.unknown;
 }
 
-export const ENGINE_SUGGESTIONS: Array<{
+export const ENGINE_SUGGESTIONS: {
   genre: string[];
   platform: string[];
   engine: EngineId;
   reason: string;
-}> = [
+}[] = [
   {
     genre: ['2d platformer', 'platformer', 'roguelite', 'roguelike', 'top-down', 'puzzle', 'metroidvania'],
     platform: ['pc', 'mac', 'linux', 'web'],

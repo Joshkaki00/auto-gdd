@@ -38,9 +38,9 @@ export function chunkMarkdown(source: string, content: string): Chunk[] {
   return chunks;
 }
 
-function splitOnHeadings(text: string): Array<{ heading: string; text: string }> {
+function splitOnHeadings(text: string): { heading: string; text: string }[] {
   const lines = text.split('\n');
-  const sections: Array<{ heading: string; text: string }> = [];
+  const sections: { heading: string; text: string }[] = [];
   let current: { heading: string; lines: string[] } = { heading: '', lines: [] };
 
   for (const line of lines) {

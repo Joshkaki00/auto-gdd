@@ -15,11 +15,15 @@
     "dev:cli": "npm run dev --workspace=packages/cli",
     "dev:mcp": "npm run dev --workspace=packages/mcp",
     "typecheck": "tsc --noEmit -p tsconfig.base.json",
+    "lint": "eslint packages/*/src --ext .ts",
+    "lint:fix": "eslint packages/*/src --ext .ts --fix",
     "clean": "npm run clean --workspaces --if-present"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "eslint": "^9.39.4",
+    "eslint-config-airbnb-extended": "^3.1.0",
+    "typescript": "^5.5.0"
   },
   "engines": {
     "node": ">=20.0.0"
