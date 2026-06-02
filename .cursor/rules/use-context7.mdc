@@ -1,0 +1,41 @@
+---
+description: Always fetch current library docs via Context7 MCP before writing code that uses any third-party package
+alwaysApply: true
+---
+
+## Use Context7 before writing library code
+
+Before writing or editing any code that calls a third-party library API, fetch current docs via Context7.
+Do **not** rely on training data for library APIs — it goes stale. Context7 is already connected.
+
+### Two-step pattern
+
+1. If the library ID is unknown → call `resolve-library-id` with the library name + your task as the query
+2. Then call `query-docs` with the resolved ID and a specific query
+
+Skip step 1 if you already have the ID (see table below).
+
+### Pre-resolved IDs for this project
+
+| Package | Context7 ID |
+|---------|-------------|
+| `ollama` (JS SDK) | `/ollama/ollama-js` |
+| `@modelcontextprotocol/sdk` | `/modelcontextprotocol/typescript-sdk` |
+| `vectra` | `/stevenic/vectra` |
+| `typescript-eslint` | `/typescript-eslint/typescript-eslint` |
+| `@stylistic/eslint-plugin` | `/eslint-stylistic/eslint-stylistic` |
+| `commander` | `/tj/commander.js` |
+| VS Code extension API | `/websites/code_visualstudio_api` |
+
+### When to call it
+
+- Adding a new method call on a library class you haven't used before
+- Unsure about an API signature, option name, or event name
+- Writing integration code between two libraries
+- Any time you think "I think this is how it works" — that's a signal to check
+
+### When to skip it
+
+- Editing plain TypeScript logic with no library calls (loops, conditionals, pure functions)
+- Updating comments, types, or refactoring within a single file
+- The exact same API was already fetched earlier in this session

@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import {
   WorkspaceDetector,
   ConfigStore,
+  CursorScaffold,
   ENGINE_PROFILES,
   EngineId,
 } from '@auto-gdd/core';
@@ -88,6 +89,7 @@ export async function runInit(cwd = process.cwd()): Promise<void> {
   console.log(chalk.dim('  Run `auto-gdd generate` to create your GDD.'));
 
   writeCLAUDEMd(cwd, wsConfig);
+  writeCursorRules(cwd, wsConfig);
 }
 
 function writeCLAUDEMd(
@@ -144,4 +146,36 @@ npx auto-gdd models            # list available Ollama models
     console.log(chalk.green(`✓ Created CLAUDE.md — Claude Code now knows your game context`));
   }
   console.log(chalk.dim(`  ${claudePath}`));
+}
+
+function writeCursorRules(
+  cwd: string,
+  cfg: {
+    gameName: string;
+    engine: EngineId;
+    genre: string;
+    platform: string;
+    outputPath: string;
+  },
+): void {
+  try {
+    const scaffold = new CursorScaffold();
+    const result = scaffold.write({
+      workspaceRoot: cwd,
+      gameName: cfg.gameName,
+      engine: cfg.engine,
+      genre: cfg.genre,
+      platform: cfg.platform,
+      outputPath: cfg.outputPath,
+    });
+
+    if (result.written.length > 0) {
+      console.log(chalk.green(`✓ Cursor rules written — context7 + project context`));
+      for (const f of result.written) {
+        console.log(chalk.dim(`  ${f}`));
+      }
+    }
+  } catch {
+    // Non-fatal — Cursor may not be installed
+  }
 }

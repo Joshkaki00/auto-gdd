@@ -10,3 +10,4 @@ export * from './rag/HybridRetriever.js';
 export * from './gdd/PromptTemplates.js';
 export * from './gdd/GDDAssembler.js';
 export * from './gdd/MarkdownWriter.js';
+export * from './cursor/CursorScaffold.js';

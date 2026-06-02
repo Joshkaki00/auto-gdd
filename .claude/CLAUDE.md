@@ -27,6 +27,19 @@ Repeated workflows are encoded in `.claude/commands/` — use them instead of re
 - `/release` — lint, build, bump, tag, publish
 - `/rag-health` — check RAG index stats and embedding availability
 
+## Library docs — use Context7 first
+
+Before writing code that calls any third-party library, fetch current docs via the `context7` MCP.
+Do not guess API signatures from training data — they go stale.
+
+Pre-resolved IDs for this project:
+- `ollama` JS SDK → `/ollama/ollama-js`
+- `@modelcontextprotocol/sdk` → `/modelcontextprotocol/typescript-sdk`
+- `vectra` → `/stevenic/vectra`
+- `typescript-eslint` → `/typescript-eslint/typescript-eslint`
+- `commander` → `/tj/commander.js`
+- VS Code extension API → `/websites/code_visualstudio_api`
+
 ## Non-negotiable rules
 
 - **Offline only.** No `openai`, `anthropic`, `groq`, or any cloud AI SDK. Hooks block installs.
