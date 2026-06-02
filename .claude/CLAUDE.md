@@ -9,25 +9,30 @@ Local AI GDD generator. Free, offline, Obsidian-ready.
 - `packages/mcp` — MCP server (Stdio) for Cursor/Claude/Windsurf
 - `packages/vscode` — VS Code/Cursor extension (CommonJS — required by VS Code API)
 
-## Commands
+## Shell commands
 
 ```bash
-npm install
-npm run build          # all packages
-npm run build:core     # core only
-npm run lint           # ESLint (Airbnb extended, TypeScript)
-npm run lint:fix       # auto-fix
+npm run build          # all packages (hooks run this after every .ts edit)
+npm run lint           # ESLint Airbnb/TypeScript
+npm run lint:fix
 cd packages/cli && node dist/index.js init
 cd packages/cli && node dist/index.js generate
-cd packages/mcp && node dist/index.js
 ```
+
+## Slash commands
+
+Repeated workflows are encoded in `.claude/commands/` — use them instead of re-explaining:
+- `/add-engine` — add a new game engine (profiles, detection, hooks, skill)
+- `/review-gdd` — invoke the gdd-reviewer agent on the latest GDD
+- `/release` — lint, build, bump, tag, publish
+- `/rag-health` — check RAG index stats and embedding availability
 
 ## Non-negotiable rules
 
-- **Offline only.** Never add `openai`, `anthropic`, `groq`, or any cloud AI SDK. A `beforeShellExecution` hook will block installs.
-- **Build runs automatically.** A `PostToolUse` hook runs `npm run build` after every `.ts` edit and surfaces errors.
-- `packages/vscode` stays CommonJS. All other packages are ESM.
-- Import paths require `.js` extension (Node16 resolution). ESLint enforces this.
+- **Offline only.** No `openai`, `anthropic`, `groq`, or any cloud AI SDK. Hooks block installs.
+- **Build is enforced.** PostToolUse hook runs `npm run build` after every `.ts` edit.
+- `packages/vscode` stays CommonJS. All others are ESM.
+- Import `.js` extensions required (Node16). ESLint enforces this.
 
 ## Where things live
 
@@ -37,9 +42,4 @@ cd packages/mcp && node dist/index.js
 | Engine profiles | `packages/core/src/engines/engineProfiles.ts` |
 | Engine detection | `packages/core/src/detector/WorkspaceDetector.ts` |
 | Config read/write | `packages/core/src/config/ConfigStore.ts` |
-
-## Adding a new engine
-
-1. Add to `ENGINE_PROFILES` in `engineProfiles.ts`
-2. Add signature to `RULES` in `WorkspaceDetector.ts`
-3. Add detection in `.cursor/hooks/workspace-open.js` and `.claude/skills/generate-gdd/SKILL.md`
+| RAG pipeline details | `packages/core/CLAUDE.md` |
