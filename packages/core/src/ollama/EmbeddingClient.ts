@@ -9,6 +9,15 @@ export class EmbeddingClient {
     this.model = model;
   }
 
+  async isReady(): Promise<boolean> {
+    try {
+      const list = await this.client.list();
+      return list.models.some(m => m.name.startsWith(this.model));
+    } catch {
+      return false;
+    }
+  }
+
   async embed(text: string): Promise<number[]> {
     const response = await this.client.embeddings({
       model: this.model,

@@ -7,6 +7,8 @@ import { getProfile } from '../engines/engineProfiles.js';
 export interface WriteOptions {
   outputDir: string;
   splitSections?: boolean;
+  /** When provided, only update these sections in an already-existing GDD file. */
+  sectionFilter?: string[];
 }
 
 export interface WriteResult {
@@ -36,10 +38,20 @@ function frontmatter(gdd: AssembledGDD): string {
 }
 
 export class MarkdownWriter {
+  /**
+   * When sectionFilter is set and the GDD file already exists, only replace the
+   * content of those sections in-place rather than rewriting the whole document.
+   */
   write(gdd: AssembledGDD, opts: WriteOptions): WriteResult {
     fs.mkdirSync(opts.outputDir, { recursive: true });
 
     const baseName = sanitize(gdd.gameName);
+    const mainFile = path.join(opts.outputDir, `${baseName} - GDD.md`);
+
+    if (opts.sectionFilter && opts.sectionFilter.length > 0 && fs.existsSync(mainFile)) {
+      return this.mergeIntoExisting(gdd, opts.sectionFilter, mainFile);
+    }
+
     const sectionFiles: string[] = [];
 
     // Build full GDD as single file
@@ -107,9 +119,41 @@ export class MarkdownWriter {
       }
     }
 
-    const mainFile = path.join(opts.outputDir, `${baseName} - GDD.md`);
     fs.writeFileSync(mainFile, lines.join('\n'), 'utf-8');
 
     return { mainFile, sectionFiles };
+  }
+
+  private mergeIntoExisting(
+    gdd: AssembledGDD,
+    sectionFilter: string[],
+    mainFile: string,
+  ): WriteResult {
+    let doc = fs.readFileSync(mainFile, 'utf-8');
+
+    for (const key of sectionFilter) {
+      const section = GDD_SECTIONS.find(s => s.key === key);
+      if (!section || !gdd.sections[key]) continue;
+
+      const newContent = gdd.sections[key];
+      const heading = `## ${section.title}`;
+
+      // Replace everything between "## Title\n" and the next "---\n" or end-of-file
+      const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(
+        `(${escapedHeading}\\n\\n?)([\\s\\S]*?)(?=\\n---\\n|\\n## |$)`,
+        'g',
+      );
+
+      if (pattern.test(doc)) {
+        doc = doc.replace(
+          new RegExp(`(${escapedHeading}\\n\\n?)([\\s\\S]*?)(?=\\n---\\n|\\n## |$)`, 'g'),
+          `${heading}\n\n${newContent}\n\n`,
+        );
+      }
+    }
+
+    fs.writeFileSync(mainFile, doc, 'utf-8');
+    return { mainFile, sectionFiles: [] };
   }
 }

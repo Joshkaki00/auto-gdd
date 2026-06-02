@@ -13,6 +13,8 @@ export interface AssembleInput {
   model: string;
   ollamaUrl?: string;
   retriever?: HybridRetriever;
+  /** When set, only generate these section keys (e.g. ['mechanics', 'story']). */
+  sectionFilter?: string[];
   onSectionStart?: (key: string, title: string, index: number, total: number) => void;
   onToken?: (token: string) => void;
   onSectionEnd?: (key: string, content: string) => void;
@@ -38,10 +40,14 @@ export class GDDAssembler {
     const engineProfile = getProfile(input.engine);
     const system = buildSystemPrompt(engineProfile);
     const sections: Record<string, string> = {};
+    const { sectionFilter } = input;
+    const activeSections = sectionFilter && sectionFilter.length > 0
+      ? GDD_SECTIONS.filter(s => sectionFilter.includes(s.key))
+      : GDD_SECTIONS;
 
-    for (let i = 0; i < GDD_SECTIONS.length; i++) {
-      const section = GDD_SECTIONS[i];
-      input.onSectionStart?.(section.key, section.title, i, GDD_SECTIONS.length);
+    for (let i = 0; i < activeSections.length; i++) {
+      const section = activeSections[i];
+      input.onSectionStart?.(section.key, section.title, i, activeSections.length);
 
       let ragContext: string | undefined;
       if (input.retriever) {

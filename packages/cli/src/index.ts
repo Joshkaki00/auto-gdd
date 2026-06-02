@@ -3,6 +3,7 @@ import { runInit } from './commands/init.js';
 import { runGenerate } from './commands/generate.js';
 import { runConfig } from './commands/config.js';
 import { runModels } from './commands/models.js';
+import { runDoctor } from './commands/doctor.js';
 import { runRagIndex, runRagList, runRagSearch, runRagClear } from './commands/rag.js';
 
 const program = new Command();
@@ -28,7 +29,13 @@ program
   .option('-m, --model <model>', 'Ollama model to use')
   .option('--split', 'Split into one file per section (Obsidian wikilinks)')
   .option('--no-rag', 'Skip RAG retrieval')
+  .option('--section <keys>', 'Regenerate specific section(s), comma-separated (e.g. mechanics,story)')
   .action((opts) => runGenerate(opts));
+
+program
+  .command('doctor')
+  .description('Check Ollama, embedding model, RAG index, and config health')
+  .action(() => runDoctor());
 
 program
   .command('config')

@@ -1,17 +1,23 @@
 {
   "name": "auto-gdd",
   "version": "0.1.0",
-  "description": "CLI for generating Game Design Documents with local AI",
+  "description": "CLI for generating Game Design Documents with local AI — free, offline, Obsidian-ready",
+  "license": "MIT",
+  "keywords": ["game design document", "gdd", "ai", "ollama", "obsidian", "game dev", "local ai"],
+  "repository": { "type": "git", "url": "https://github.com/auto-gdd/auto-gdd" },
   "type": "module",
   "bin": {
     "auto-gdd": "./dist/index.js"
   },
   "main": "./dist/index.js",
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": { "node": ">=20.0.0" },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@auto-gdd/core": "*",

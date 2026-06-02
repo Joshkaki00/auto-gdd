@@ -23,6 +23,8 @@ interface GenerateFlags {
   model?: string;
   split?: boolean;
   noRag?: boolean;
+  /** Comma-separated section key(s) to regenerate (e.g. "mechanics" or "mechanics,story"). */
+  section?: string;
 }
 
 export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Promise<void> {
@@ -60,6 +62,22 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
   const finalPlatform = platform ?? answers.platform;
   const finalConcept = flags.concept ?? answers.concept ?? '';
   const finalModel = flags.model ?? config.model ?? OllamaClient.recommendModel();
+
+  const sectionFilter = flags.section
+    ? flags.section.split(',').map(s => s.trim()).filter(Boolean)
+    : undefined;
+
+  // Validate section keys early
+  if (sectionFilter && sectionFilter.length > 0) {
+    const validKeys = GDD_SECTIONS.map(s => s.key);
+    const invalid = sectionFilter.filter(k => !validKeys.includes(k));
+    if (invalid.length > 0) {
+      console.error(chalk.red(`\nUnknown section key(s): ${invalid.join(', ')}`));
+      console.error(chalk.dim(`Valid keys: ${validKeys.join(', ')}`));
+      process.exit(1);
+    }
+    console.log(chalk.dim(`\nSection mode: regenerating [${sectionFilter.join(', ')}]`));
+  }
 
   // Engine detection
   let {engine} = config;
@@ -123,6 +141,7 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
     engine,
     model: finalModel,
     retriever,
+    sectionFilter,
     onSectionStart: (_key, title, i, total) => {
       sectionStartTime = Date.now();
       sectionTokenCount = 0;
@@ -150,8 +169,9 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
   });
 
   const totalElapsed = ((Date.now() - totalStartTime) / 1000).toFixed(0);
+  const sectionCount = sectionFilter?.length ?? GDD_SECTIONS.length;
   process.stdout.write(
-    chalk.bold.green(`\n✓ All ${GDD_SECTIONS.length} sections complete`) +
+    chalk.bold.green(`\n✓ ${sectionCount} section${sectionCount === 1 ? '' : 's'} complete`) +
     chalk.dim(` (${totalTokens} tokens · ${totalElapsed}s)\n`),
   );
 
@@ -160,6 +180,7 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
   const result = writer.write(gdd, {
     outputDir: path.resolve(cwd, outputPath),
     splitSections: flags.split ?? false,
+    sectionFilter,
   });
 
   console.log(chalk.green(`\n✓ GDD written to: ${result.mainFile}`));
