@@ -1,3 +1,10 @@
+// TODO(2026-07-28): bump @modelcontextprotocol/sdk when Tier-1 SDK ships
+// 2026-07-28 spec support. The SDK is expected to add first-class
+// server/discover, stateless _meta, and subscriptions/listen within
+// the 10-week RC window (locked 2026-05-21, ships 2026-07-28).
+// When it does: remove the hand-rolled ServerDiscoverRequestSchema below,
+// replace with the SDK export, and drop the custom z import.
+import { z } from 'zod';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -8,6 +15,15 @@ import {
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+
+// ─── Forward-compat: 2026-07-28 server/discover ───────────────────────────────
+// Spec requires servers to implement this RPC. Clients call it for capability
+// negotiation instead of the stateful initialize/initialized handshake.
+const ServerDiscoverRequestSchema = z.object({
+  method: z.literal('server/discover'),
+  params: z.object({ _meta: z.object({}).passthrough().optional() }).optional(),
+});
+type ServerDiscoverRequest = z.infer<typeof ServerDiscoverRequestSchema>;
 import path from 'node:path';
 import {
   ConfigStore,
@@ -26,20 +42,45 @@ import {
 const cwd = process.cwd();
 const store = new ConfigStore(cwd);
 
+const SERVER_INFO = { name: 'auto-gdd', version: '0.1.0' } as const;
+// Protocol versions this server speaks (current stable + upcoming RC)
+const SUPPORTED_PROTOCOL_VERSIONS = ['2025-11-25', '2026-07-28'] as const;
+
 const server = new Server(
-  { name: 'auto-gdd', version: '0.1.0' },
+  SERVER_INFO,
   {
     capabilities: {
       tools: {},
       resources: {},
       prompts: {},
+      // extensions field per 2026-07-28 minor change
+      extensions: {},
     },
   },
 );
 
+// ─── server/discover (2026-07-28 RC required) ─────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+server.setRequestHandler(ServerDiscoverRequestSchema as any, async (_req: ServerDiscoverRequest) => ({
+  protocolVersions: SUPPORTED_PROTOCOL_VERSIONS,
+  serverInfo: SERVER_INFO,
+  capabilities: {
+    tools: {},
+    resources: {},
+    prompts: {},
+    extensions: {},
+  },
+}));
+
 // ─── Tools ────────────────────────────────────────────────────────────────────
 
+// ttlMs/cacheScope per 2026-07-28 CacheableResult requirement.
+// ttlMs: 0 = always revalidate (tool list changes rarely but we play it safe).
+// cacheScope: "public" = shared clients may cache.
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
+  ttlMs: 0,
+  cacheScope: 'public' as const,
   tools: [
     {
       name: 'gdd_generate',
@@ -254,6 +295,8 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 // ─── Resources ────────────────────────────────────────────────────────────────
 
 server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+  ttlMs: 0,
+  cacheScope: 'public' as const,
   resources: [
     {
       uri: 'gdd://list',
@@ -309,6 +352,8 @@ server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
 // ─── Prompts ──────────────────────────────────────────────────────────────────
 
 server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+  ttlMs: 0,
+  cacheScope: 'public' as const,
   prompts: [{
     name: 'gdd_prompt',
     description: 'Full section-by-section GDD prompt template. Use to understand what auto-gdd will generate.',
