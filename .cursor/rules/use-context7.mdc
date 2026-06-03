@@ -25,6 +25,7 @@ Skip step 1 if you already have the ID (see table below).
 | `typescript-eslint` | `/typescript-eslint/typescript-eslint` |
 | `@stylistic/eslint-plugin` | `/eslint-stylistic/eslint-stylistic` |
 | `commander` | `/tj/commander.js` |
+| `zod` | `/colinhacks/zod` |
 | VS Code extension API | `/websites/code_visualstudio_api` |
 
 ### When to call it

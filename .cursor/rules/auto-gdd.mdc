@@ -8,7 +8,7 @@ alwaysApply: true
 Local AI GDD generator. Offline-only. Never add cloud API calls.
 
 ### Package layout
-- `packages/core` — all shared logic (Ollama, RAG, GDD assembler). No CLI/UI deps.
+- `packages/core` — all shared logic (Ollama, RAG, GDD assembler, CursorScaffold). No CLI/UI deps.
 - `packages/cli` — `npx auto-gdd` terminal interface
 - `packages/mcp` — MCP server (Stdio) for Cursor/Claude/Windsurf
 - `packages/vscode` — VS Code/Cursor extension (CommonJS — required by VS Code API)
@@ -18,6 +18,7 @@ Local AI GDD generator. Offline-only. Never add cloud API calls.
 - **Build after every `.ts` edit.** A `postToolUse` hook runs `npm run build` automatically and surfaces errors.
 - **ESM everywhere except `packages/vscode`**, which must stay CommonJS for the VS Code extension API.
 - **Import paths must include `.js` extension** (Node16 module resolution). ESLint enforces this.
+- **Node.js ≥ 22 required.** vectra 0.14+ hard-requires Node 22; Node 20 reached EOL March 2026.
 
 ### Where things live
 | Concern | File |
@@ -26,9 +27,16 @@ Local AI GDD generator. Offline-only. Never add cloud API calls.
 | Game engine profiles | `packages/core/src/engines/engineProfiles.ts` |
 | Engine auto-detection | `packages/core/src/detector/WorkspaceDetector.ts` |
 | Config read/write | `packages/core/src/config/ConfigStore.ts` |
+| Cursor rules scaffolding | `packages/core/src/cursor/CursorScaffold.ts` |
 | Vector store | `.auto-gdd-vectors/` (vectra, file-based, no server) |
+
+### Key dependency notes
+- `vectra` v0.15 — `queryItems(vector, query, topK)` — the query string is now a required 2nd arg.
+- `nomic-embed-text:v1.5` — embedding model is pinned. Use `embedDocument(text)` for indexing and `embedQuery(text)` for search; never call bare `embed()` for new code.
+- `commander` v14 — `action()` callbacks receive options as plain objects; named sub-commands use `.command(name).action(fn)`.
 
 ### Adding a new engine
 1. Add to `ENGINE_PROFILES` in `engineProfiles.ts`
 2. Add signature to `RULES` array in `WorkspaceDetector.ts`
-3. Add detection in `.cursor/hooks/workspace-open.js`
+3. Add engine → context7 ID entry in `CursorScaffold.ts` (`ENGINE_CONTEXT7`)
+4. Add detection in `.cursor/hooks/workspace-open.js`

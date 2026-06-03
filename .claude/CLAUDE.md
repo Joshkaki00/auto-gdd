@@ -4,7 +4,7 @@ Local AI GDD generator. Free, offline, Obsidian-ready.
 
 ## Packages
 
-- `packages/core` — shared engine (WorkspaceDetector, ConfigStore, OllamaClient, EmbeddingClient, RAGIndexer, HybridRetriever, GDDAssembler, MarkdownWriter)
+- `packages/core` — shared engine (WorkspaceDetector, ConfigStore, OllamaClient, EmbeddingClient, RAGIndexer, HybridRetriever, GDDAssembler, MarkdownWriter, CursorScaffold)
 - `packages/cli` — `npx auto-gdd` terminal interface
 - `packages/mcp` — MCP server (Stdio) for Cursor/Claude/Windsurf
 - `packages/vscode` — VS Code/Cursor extension (CommonJS — required by VS Code API)
@@ -13,10 +13,12 @@ Local AI GDD generator. Free, offline, Obsidian-ready.
 
 ```bash
 npm run build          # all packages (hooks run this after every .ts edit)
-npm run lint           # ESLint Airbnb/TypeScript
+npm run lint           # ESLint Airbnb/TypeScript flat config
 npm run lint:fix
-cd packages/cli && node dist/index.js init
-cd packages/cli && node dist/index.js generate
+cd packages/cli && node dist/index.js doctor        # health check
+cd packages/cli && node dist/index.js init          # detect engine + scaffold Cursor rules
+cd packages/cli && node dist/index.js generate      # full GDD
+cd packages/cli && node dist/index.js generate --section mechanics   # regenerate one section
 ```
 
 ## Slash commands
@@ -46,6 +48,7 @@ Pre-resolved IDs for this project:
 - **Build is enforced.** PostToolUse hook runs `npm run build` after every `.ts` edit.
 - `packages/vscode` stays CommonJS. All others are ESM.
 - Import `.js` extensions required (Node16). ESLint enforces this.
+- Node.js **≥ 22** required (vectra 0.14+ hard requirement; Node 20 EOL March 2026).
 
 ## Where things live
 
@@ -55,4 +58,10 @@ Pre-resolved IDs for this project:
 | Engine profiles | `packages/core/src/engines/engineProfiles.ts` |
 | Engine detection | `packages/core/src/detector/WorkspaceDetector.ts` |
 | Config read/write | `packages/core/src/config/ConfigStore.ts` |
+| Cursor rules scaffolding | `packages/core/src/cursor/CursorScaffold.ts` |
 | RAG pipeline details | `packages/core/CLAUDE.md` |
+| Vector store | `.auto-gdd-vectors/` (vectra file-based, no server) |
+
+## Upcoming
+
+`TODO(2026-07-28)` in `packages/mcp/src/index.ts` — bump `@modelcontextprotocol/sdk` and replace hand-rolled `ServerDiscoverRequestSchema` once Tier-1 SDK ships 2026-07-28 spec support.
