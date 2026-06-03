@@ -30,7 +30,7 @@ export class HybridRetriever {
 
     const queryVec = await this.embedder.embed(query);
 
-    const vectorResults = await this.vectorSearch(queryVec, topK * 4);
+    const vectorResults = await this.vectorSearch(queryVec, query, topK * 4);
     const bm25Results = await this.bm25Search(query, topK * 4);
 
     const fused = this.reciprocalRankFusion(vectorResults, bm25Results);
@@ -40,9 +40,9 @@ export class HybridRetriever {
     return reranked.slice(0, topK);
   }
 
-  private async vectorSearch(queryVec: number[], k: number): Promise<RetrievedChunk[]> {
+  private async vectorSearch(queryVec: number[], query: string, k: number): Promise<RetrievedChunk[]> {
     try {
-      const results: QueryResult<ChunkMeta>[] = await this.index.queryItems(queryVec, k);
+      const results: QueryResult<ChunkMeta>[] = await this.index.queryItems(queryVec, query, k);
       return results.map(r => ({
         text: getMeta(r.item.metadata, 'text'),
         parentText: getMeta(r.item.metadata, 'parentText'),
