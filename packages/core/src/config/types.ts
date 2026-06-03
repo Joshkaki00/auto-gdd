@@ -51,6 +51,6 @@ export interface ResolvedConfig {
 export const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
   ollamaUrl: 'http://localhost:11434',
   model: 'phi4-mini',
-  embeddingModel: 'nomic-embed-text',
+  embeddingModel: 'nomic-embed-text:v1.5',
   vectorStorePath: '',
 };

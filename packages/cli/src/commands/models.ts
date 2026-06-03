@@ -32,5 +32,5 @@ export async function runModels(cwd = process.cwd()): Promise<void> {
   console.log(chalk.dim('  8 GB RAM  → ollama pull phi4-mini'));
   console.log(chalk.dim('  16 GB RAM → ollama pull qwen3:4b'));
   console.log(chalk.dim('  32 GB RAM → ollama pull qwen3:7b'));
-  console.log(chalk.dim('  Embeddings → ollama pull nomic-embed-text'));
+  console.log(chalk.dim('  Embeddings → ollama pull nomic-embed-text:v1.5'));
 }

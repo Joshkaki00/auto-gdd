@@ -55,7 +55,7 @@ export class RAGIndexer {
       const chunks = chunkMarkdown(filePath, content);
       if (chunks.length === 0) return null;
 
-      const vectors = await this.embedder.embedBatch(chunks.map(c => c.text));
+      const vectors = await Promise.all(chunks.map(c => this.embedder.embedDocument(c.text)));
 
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];

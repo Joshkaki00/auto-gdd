@@ -28,7 +28,7 @@ export class HybridRetriever {
   async retrieve(query: string, topK = 5): Promise<RetrievedChunk[]> {
     if (!(await this.index.isIndexCreated())) return [];
 
-    const queryVec = await this.embedder.embed(query);
+    const queryVec = await this.embedder.embedQuery(query);
 
     const vectorResults = await this.vectorSearch(queryVec, query, topK * 4);
     const bm25Results = await this.bm25Search(query, topK * 4);
@@ -116,7 +116,7 @@ export class HybridRetriever {
   private async rerank(query: string, candidates: RetrievedChunk[], queryVec: number[]): Promise<RetrievedChunk[]> {
     const scored = await Promise.all(
       candidates.map(async c => {
-        const vec = await this.embedder.embed(c.parentText || c.text);
+        const vec = await this.embedder.embedDocument(c.parentText || c.text);
         return { ...c, score: this.embedder.cosineSimilarity(queryVec, vec) };
       }),
     );

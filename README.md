@@ -34,7 +34,7 @@ Choose based on your hardware:
 
 For RAG (optional but recommended):
 ```bash
-ollama pull nomic-embed-text
+ollama pull nomic-embed-text:v1.5
 ```
 
 ### 3. Generate your first GDD

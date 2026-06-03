@@ -3,15 +3,32 @@
   "version": "0.1.0",
   "description": "CLI for generating Game Design Documents with local AI — free, offline, Obsidian-ready",
   "license": "MIT",
-  "keywords": ["game design document", "gdd", "ai", "ollama", "obsidian", "game dev", "local ai"],
-  "repository": { "type": "git", "url": "https://github.com/auto-gdd/auto-gdd" },
+  "keywords": [
+    "game design document",
+    "gdd",
+    "ai",
+    "ollama",
+    "obsidian",
+    "game dev",
+    "local ai"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/auto-gdd/auto-gdd"
+  },
   "type": "module",
   "bin": {
     "auto-gdd": "./dist/index.js"
   },
   "main": "./dist/index.js",
-  "files": ["dist", "README.md", "LICENSE"],
-  "engines": { "node": ">=22.0.0" },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -21,14 +38,14 @@
   },
   "dependencies": {
     "@auto-gdd/core": "*",
-    "commander": "^12.0.0",
-    "inquirer": "^10.0.0",
     "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "inquirer": "^14.0.2",
     "ora": "^8.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
     "@types/node": "^22.0.0",
-    "rimraf": "^6.0.0"
+    "rimraf": "^6.0.0",
+    "typescript": "^5.5.0"
   }
 }

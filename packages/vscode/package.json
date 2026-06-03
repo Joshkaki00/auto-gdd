@@ -61,7 +61,7 @@
         },
         "auto-gdd.embeddingModel": {
           "type": "string",
-          "default": "nomic-embed-text",
+          "default": "nomic-embed-text:v1.5",
           "description": "Embedding model for RAG"
         }
       }
