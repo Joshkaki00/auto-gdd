@@ -23,9 +23,16 @@ interface GenerateFlags {
   output?: string;
   model?: string;
   split?: boolean;
-  noRag?: boolean;
-  /** Skip codebase scanning — use when the project has no source files yet */
-  noScan?: boolean;
+  /**
+   * Commander sets this to `false` when `--no-rag` is passed, `true` otherwise.
+   * Do NOT rename to `noRag` — commander strips the `no-` prefix from the attribute name.
+   */
+  rag?: boolean;
+  /**
+   * Commander sets this to `false` when `--no-scan` is passed, `true` otherwise.
+   * Do NOT rename to `noScan` — commander strips the `no-` prefix from the attribute name.
+   */
+  scan?: boolean;
   /** Comma-separated section key(s) to regenerate (e.g. "mechanics" or "mechanics,story"). */
   section?: string;
 }
@@ -116,7 +123,7 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
 
   // RAG setup
   let retriever: HybridRetriever | undefined;
-  if (!flags.noRag && config.ragSourcePath) {
+  if (flags.rag !== false && config.ragSourcePath) {
     const embedder = new EmbeddingClient(config.ollamaUrl, config.embeddingModel);
     const indexer = new RAGIndexer(config.vectorStorePath, embedder);
     await indexer.init();
@@ -129,7 +136,7 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
 
   // Codebase scan
   let codebaseContext: string | undefined;
-  if (!flags.noScan) {
+  if (flags.scan !== false) {
     const scanSpinner = ora('Scanning codebase...').start();
     try {
       const scanner = new WorkspaceScanner(cwd, engine);
