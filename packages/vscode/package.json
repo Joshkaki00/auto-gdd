@@ -4,10 +4,23 @@
   "description": "Generate Game Design Documents with local AI — free, offline, Obsidian-ready",
   "version": "0.1.0",
   "publisher": "auto-gdd",
-  "engines": { "vscode": "^1.90.0" },
-  "categories": ["Other", "AI"],
-  "keywords": ["game design", "gdd", "ai", "ollama", "obsidian"],
-  "activationEvents": ["onStartupFinished"],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "keywords": [
+    "game design",
+    "gdd",
+    "ai",
+    "ollama",
+    "obsidian"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -33,18 +46,22 @@
       }
     ],
     "viewsContainers": {
-      "activitybar": [{
-        "id": "auto-gdd",
-        "title": "Auto-GDD",
-        "icon": "$(game)"
-      }]
+      "activitybar": [
+        {
+          "id": "auto-gdd",
+          "title": "Auto-GDD",
+          "icon": "$(game)"
+        }
+      ]
     },
     "views": {
-      "auto-gdd": [{
-        "type": "webview",
-        "id": "auto-gdd.panel",
-        "name": "Game Design"
-      }]
+      "auto-gdd": [
+        {
+          "type": "webview",
+          "id": "auto-gdd.panel",
+          "name": "Game Design"
+        }
+      ]
     },
     "configuration": {
       "title": "Auto-GDD",
@@ -78,8 +95,8 @@
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",
-    "@vscode/vsce": "^3.0.0",
-    "typescript": "^5.5.0",
-    "rimraf": "^6.0.0"
+    "@vscode/vsce": "^3.9.2",
+    "rimraf": "^6.0.0",
+    "typescript": "^5.5.0"
   }
 }

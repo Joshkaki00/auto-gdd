@@ -1,7 +1,25 @@
 {
   "name": "@auto-gdd/core",
   "version": "0.1.0",
-  "description": "Core GDD engine: Ollama client, RAG pipeline, workspace detector, GDD assembler",
+  "description": "Core GDD engine for auto-gdd: Ollama client, RAG pipeline, workspace detector, codebase scanner, GDD assembler",
+  "license": "MIT",
+  "keywords": [
+    "game design document",
+    "gdd",
+    "ollama",
+    "rag",
+    "local ai",
+    "game dev"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/auto-gdd/auto-gdd",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/auto-gdd/auto-gdd#readme",
+  "bugs": {
+    "url": "https://github.com/auto-gdd/auto-gdd/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,10 +29,19 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "glob": "^11.0.0",

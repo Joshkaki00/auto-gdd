@@ -4,7 +4,9 @@
   "description": "MCP server for auto-GDD — use from Cursor, Claude Desktop, Windsurf",
   "license": "MIT",
   "keywords": ["mcp", "game design document", "gdd", "ai", "ollama", "cursor", "claude"],
-  "repository": { "type": "git", "url": "https://github.com/auto-gdd/auto-gdd" },
+  "repository": { "type": "git", "url": "https://github.com/auto-gdd/auto-gdd", "directory": "packages/mcp" },
+  "homepage": "https://github.com/auto-gdd/auto-gdd#readme",
+  "bugs": { "url": "https://github.com/auto-gdd/auto-gdd/issues" },
   "type": "module",
   "bin": {
     "auto-gdd-mcp": "./dist/index.js"
@@ -21,7 +23,7 @@
   },
   "dependencies": {
     "@auto-gdd/core": "*",
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
