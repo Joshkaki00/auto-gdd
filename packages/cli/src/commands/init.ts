@@ -7,6 +7,7 @@ import {
   WorkspaceDetector,
   ConfigStore,
   CursorScaffold,
+  WorkspaceScanner,
   ENGINE_PROFILES,
   EngineId,
 } from '@auto-gdd/core';
@@ -90,6 +91,7 @@ export async function runInit(cwd = process.cwd()): Promise<void> {
 
   writeCLAUDEMd(cwd, wsConfig);
   writeCursorRules(cwd, wsConfig);
+  await runCodebaseScan(cwd, wsConfig.engine);
 }
 
 function writeCLAUDEMd(
@@ -146,6 +148,39 @@ npx auto-gdd models            # list available Ollama models
     console.log(chalk.green(`✓ Created CLAUDE.md — Claude Code now knows your game context`));
   }
   console.log(chalk.dim(`  ${claudePath}`));
+}
+
+async function runCodebaseScan(cwd: string, engine: EngineId): Promise<void> {
+  const spinner = ora('Scanning codebase (read-only — secrets and binaries excluded)...').start();
+  try {
+    const scanner = new WorkspaceScanner(cwd, engine);
+    const result = scanner.scan();
+    spinner.stop();
+
+    if (result.totalSourceFilesFound === 0) {
+      console.log(chalk.dim('\n  No source files found yet — that is fine for a new project.'));
+      console.log(chalk.dim('  Re-run `auto-gdd generate` after adding code to get grounded output.'));
+      return;
+    }
+
+    const langSummary = Object.entries(result.languageBreakdown)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 4)
+      .map(([lang, count]) => `${lang} (${count})`)
+      .join(', ');
+
+    console.log(chalk.green(`\n✓ Codebase scanned — ${result.totalSourceFilesFound} source file(s) found`));
+    console.log(chalk.dim(`  Languages: ${langSummary}`));
+    console.log(chalk.dim(`  ${result.ignoredCount} paths excluded (binaries, secrets, generated dirs)`));
+    if (result.keyFiles.length > 0) {
+      console.log(chalk.dim(`  Key files: ${result.keyFiles.map(f => f.relativePath).join(', ')}`));
+    }
+    console.log(chalk.dim('  GDD generation will reference actual class/file names from your project.'));
+    console.log(chalk.dim('  Add a .auto-gdd-ignore file to exclude any additional paths.'));
+  } catch {
+    spinner.stop();
+    console.log(chalk.dim('\n  Codebase scan skipped (could not read directory).'));
+  }
 }
 
 function writeCursorRules(

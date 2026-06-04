@@ -11,3 +11,4 @@ export * from './gdd/PromptTemplates.js';
 export * from './gdd/GDDAssembler.js';
 export * from './gdd/MarkdownWriter.js';
 export * from './cursor/CursorScaffold.js';
+export * from './scanner/WorkspaceScanner.js';

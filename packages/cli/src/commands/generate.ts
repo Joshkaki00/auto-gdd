@@ -10,6 +10,7 @@ import {
   HybridRetriever,
   GDDAssembler,
   MarkdownWriter,
+  WorkspaceScanner,
   GDD_SECTIONS,
   suggestEngine,
 } from '@auto-gdd/core';
@@ -23,6 +24,8 @@ interface GenerateFlags {
   model?: string;
   split?: boolean;
   noRag?: boolean;
+  /** Skip codebase scanning — use when the project has no source files yet */
+  noScan?: boolean;
   /** Comma-separated section key(s) to regenerate (e.g. "mechanics" or "mechanics,story"). */
   section?: string;
 }
@@ -124,6 +127,29 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
     }
   }
 
+  // Codebase scan
+  let codebaseContext: string | undefined;
+  if (!flags.noScan) {
+    const scanSpinner = ora('Scanning codebase...').start();
+    try {
+      const scanner = new WorkspaceScanner(cwd, engine);
+      const scanResult = scanner.scan();
+      scanSpinner.stop();
+      if (scanResult.totalSourceFilesFound > 0) {
+        codebaseContext = WorkspaceScanner.toContextString(scanResult);
+        const langSummary = Object.entries(scanResult.languageBreakdown)
+          .sort(([, a], [, b]) => b - a).slice(0, 3)
+          .map(([lang, count]) => `${lang}×${count}`).join(', ');
+        console.log(chalk.dim(`Codebase: ${scanResult.totalSourceFilesFound} source files (${langSummary})`));
+      } else {
+        scanSpinner.stop();
+        console.log(chalk.dim('Codebase: no source files yet — GDD will be concept-only'));
+      }
+    } catch {
+      scanSpinner.stop();
+    }
+  }
+
   console.log(chalk.bold(`\nGenerating GDD for "${finalName}" (${finalGenre} · ${finalPlatform})`));
   console.log(chalk.dim(`Model: ${finalModel} · Engine: ${engine} · Sections: ${GDD_SECTIONS.length}\n`));
 
@@ -142,6 +168,7 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
     model: finalModel,
     retriever,
     sectionFilter,
+    codebaseContext,
     onSectionStart: (_key, title, i, total) => {
       sectionStartTime = Date.now();
       sectionTokenCount = 0;

@@ -1,5 +1,7 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
       "Bash(npm install*)",
       "Bash(npm run build*)",
@@ -11,9 +13,19 @@
       "Bash(git commit *)",
       "Bash(git status)",
       "Bash(git diff *)",
-      "Bash(git log *)"
+      "Bash(git log *)",
+      "Bash(git stash*)",
+      "Bash(git checkout *)",
+      "Bash(git branch*)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(npm publish*)"
     ],
     "deny": [
+      "Bash(curl*)",
+      "Bash(wget*)",
+      "Bash(sudo*)",
       "Bash(npm install*openai*)",
       "Bash(npm install*anthropic*)",
       "Bash(npm install*groq*)",
@@ -21,8 +33,14 @@
       "Bash(npm install*cohere*)",
       "Bash(npm install*mistralai*)",
       "Bash(npm install*replicate*)",
-      "Bash(npm install*together-ai*)"
-    ]
+      "Bash(npm install*together-ai*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(secrets/**)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/credentials)"
+    ],
+    "disableBypassPermissionsMode": "disable"
   },
   "hooks": {
     "PostToolUse": [

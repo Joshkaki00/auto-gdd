@@ -7,6 +7,8 @@ export interface GDDInput {
   concept: string;
   engine: EngineProfile;
   ragContext?: string;
+  /** Codebase snapshot from WorkspaceScanner.toContextString(), injected into system prompt */
+  codebaseContext?: string;
 }
 
 export interface SectionPrompt {
@@ -16,12 +18,16 @@ export interface SectionPrompt {
   prompt: (input: GDDInput) => string;
 }
 
-const BASE_SYSTEM = (engine: EngineProfile) =>
+const BASE_SYSTEM = (engine: EngineProfile, codebaseContext?: string) =>
   `You are an expert game designer writing a professional Game Design Document (GDD).
 Write detailed, specific, actionable content — avoid vague filler.
 ${engine.id !== 'unknown' ? `The game is being built in ${engine.displayName}. ${engine.mechanicsVocabulary}` : ''}
 Format output in clean Markdown with headings, bullet points, and tables where appropriate.
-Do not include meta-commentary. Only output the section content.`;
+Do not include meta-commentary. Only output the section content.${
+  codebaseContext
+    ? `\n\nThe following is a read-only snapshot of the game project's codebase. Use it to make the GDD accurate and grounded in what already exists — reference actual file names, class names, and systems where relevant.\n\n${codebaseContext}`
+    : ''
+}`;
 
 const ragBlock = (ctx?: string) =>
   ctx ? `\n\n## Reference Material\nUse the following retrieved context to ground your writing:\n\n${ctx}\n\n---\n\n` : '';
@@ -211,6 +217,6 @@ Include:
   },
 ];
 
-export function buildSystemPrompt(engine: EngineProfile): string {
-  return BASE_SYSTEM(engine);
+export function buildSystemPrompt(engine: EngineProfile, codebaseContext?: string): string {
+  return BASE_SYSTEM(engine, codebaseContext);
 }

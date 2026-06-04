@@ -15,6 +15,11 @@ export interface AssembleInput {
   retriever?: HybridRetriever;
   /** When set, only generate these section keys (e.g. ['mechanics', 'story']). */
   sectionFilter?: string[];
+  /**
+   * Codebase snapshot from WorkspaceScanner.toContextString().
+   * Injected into the system prompt so every section can reference actual code structure.
+   */
+  codebaseContext?: string;
   onSectionStart?: (key: string, title: string, index: number, total: number) => void;
   onToken?: (token: string) => void;
   onSectionEnd?: (key: string, content: string) => void;
@@ -38,7 +43,7 @@ export class GDDAssembler {
 
   async assemble(input: AssembleInput): Promise<AssembledGDD> {
     const engineProfile = getProfile(input.engine);
-    const system = buildSystemPrompt(engineProfile);
+    const system = buildSystemPrompt(engineProfile, input.codebaseContext);
     const sections: Record<string, string> = {};
     const { sectionFilter } = input;
     const activeSections = sectionFilter && sectionFilter.length > 0

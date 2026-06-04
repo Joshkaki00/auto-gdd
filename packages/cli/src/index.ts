@@ -29,6 +29,7 @@ program
   .option('-m, --model <model>', 'Ollama model to use')
   .option('--split', 'Split into one file per section (Obsidian wikilinks)')
   .option('--no-rag', 'Skip RAG retrieval')
+  .option('--no-scan', 'Skip codebase scanning (use for empty/new projects)')
   .option('--section <keys>', 'Regenerate specific section(s), comma-separated (e.g. mechanics,story)')
   .action((opts) => runGenerate(opts));
 
