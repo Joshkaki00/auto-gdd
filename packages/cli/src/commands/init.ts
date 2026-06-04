@@ -140,13 +140,15 @@ npx auto-gdd models            # list available Ollama models
   - For code snippets, target ${profile?.displayName ?? cfg.engine}${profile?.language ? ` (${profile.language})` : ''}
 `;
 
-  writeFileSync(claudePath, content, 'utf-8');
-
   if (alreadyExists) {
-    console.log(chalk.yellow(`\n↻ Updated CLAUDE.md with game context`));
-  } else {
-    console.log(chalk.green(`✓ Created CLAUDE.md — Claude Code now knows your game context`));
+    console.log(chalk.dim(`\n  CLAUDE.md already exists — not overwritten.`));
+    console.log(chalk.dim(`  Add game context manually or delete the file and re-run init.`));
+    console.log(chalk.dim(`  Game: ${cfg.gameName} · Engine: ${profile?.displayName ?? cfg.engine} · GDD: ${cfg.outputPath}`));
+    return;
   }
+
+  writeFileSync(claudePath, content, 'utf-8');
+  console.log(chalk.green(`✓ Created CLAUDE.md — Claude Code now knows your game context`));
   console.log(chalk.dim(`  ${claudePath}`));
 }
 

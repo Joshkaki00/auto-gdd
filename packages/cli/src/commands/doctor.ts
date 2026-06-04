@@ -59,7 +59,9 @@ export async function runDoctor(cwd = process.cwd()): Promise<void> {
       else { fail(`Configured model "${config.model}" not found — run: ollama pull ${config.model}`); allOk = false; }
     }
   } else {
-    fail(`Ollama not running at ${config.ollamaUrl} — run: ollama serve`);
+    fail(`Ollama not running at ${config.ollamaUrl}`);
+    console.log(chalk.dim('    Already installed?  run: ollama serve'));
+    console.log(chalk.dim('    First time?         install from: https://ollama.com'));
     allOk = false;
   }
 

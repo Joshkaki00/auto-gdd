@@ -54,12 +54,13 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
   if (!gameName) missing.push({ type: 'input', name: 'gameName', message: 'Game name:' });
   if (!genre) missing.push({ type: 'input', name: 'genre', message: 'Genre:' });
   if (!platform) missing.push({ type: 'input', name: 'platform', message: 'Target platform(s):' });
-  missing.push({
-    type: 'input',
-    name: 'concept',
-    message: 'Describe the game concept (2–4 sentences):',
-    default: flags.concept,
-  });
+  if (!flags.concept) {
+    missing.push({
+      type: 'input',
+      name: 'concept',
+      message: 'Describe the game concept (2–4 sentences):',
+    });
+  }
 
   if (missing.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,22 +104,17 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
   const llmClient = new OllamaClient(config.ollamaUrl);
   const running = await llmClient.isRunning();
   if (!running) {
-    console.error(chalk.red('\nOllama is not running. Start it with: ollama serve'));
+    console.error(chalk.red('\nOllama is not running.'));
+    console.error(chalk.dim('  Already installed?  run: ollama serve'));
+    console.error(chalk.dim('  First time?         install from: https://ollama.com'));
     process.exit(1);
   }
 
   const hasModel = await llmClient.hasModel(finalModel);
   if (!hasModel) {
-    console.warn(chalk.yellow(`\nModel "${finalModel}" not found locally. Pulling...`));
-    const spinner = ora(`Pulling ${finalModel}...`).start();
-    try {
-      // ollama pull is done via CLI; advise user
-      spinner.fail(`Run: ollama pull ${finalModel}`);
-      process.exit(1);
-    } catch {
-      spinner.fail(`Could not pull model.`);
-      process.exit(1);
-    }
+    console.error(chalk.yellow(`\nModel "${finalModel}" not found locally.`));
+    console.error(chalk.dim(`  Run: ollama pull ${finalModel}`));
+    process.exit(1);
   }
 
   // RAG setup
