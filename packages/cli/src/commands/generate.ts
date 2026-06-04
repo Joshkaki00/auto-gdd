@@ -35,11 +35,18 @@ interface GenerateFlags {
   scan?: boolean;
   /** Comma-separated section key(s) to regenerate (e.g. "mechanics" or "mechanics,story"). */
   section?: string;
+  /** Non-interactive mode: use config + flags only. Exit if required fields are missing. */
+  yes?: boolean;
 }
 
 export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Promise<void> {
   const store = new ConfigStore(cwd);
   const config = store.resolve();
+
+  // Nudge users who skipped init
+  if (!store.readWorkspace().gameName) {
+    console.log(chalk.dim('  Tip: run `auto-gdd init` first to auto-detect your engine and save defaults.\n'));
+  }
 
   // Fill in missing fields from flags or prompt
   const gameName = flags.name ?? config.gameName;
@@ -60,6 +67,13 @@ export async function runGenerate(flags: GenerateFlags, cwd = process.cwd()): Pr
       name: 'concept',
       message: 'Describe the game concept (2–4 sentences):',
     });
+  }
+
+  if (missing.length > 0 && flags.yes) {
+    const required = missing.map((m: { name: string }) => `--${m.name}`).join(', ');
+    console.error(chalk.red(`\nMissing required fields for non-interactive mode: ${required}`));
+    console.error(chalk.dim('  Provide them via flags or run `auto-gdd init` to save defaults.'));
+    process.exit(1);
   }
 
   if (missing.length > 0) {

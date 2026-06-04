@@ -1,5 +1,10 @@
 # Auto-GDD
 
+[![npm version](https://img.shields.io/npm/v/auto-gdd)](https://www.npmjs.com/package/auto-gdd)
+[![CI](https://github.com/auto-gdd/auto-gdd/actions/workflows/ci.yml/badge.svg)](https://github.com/auto-gdd/auto-gdd/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Node.js ≥22](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
+
 > Generate professional Game Design Documents with local AI — free, offline, Obsidian-ready.
 
 No cloud. No API keys. No subscriptions. Just Ollama running on your machine.
@@ -88,6 +93,12 @@ npx auto-gdd generate --section mechanics,story
 # Skip codebase scan (for empty/concept-stage projects)
 npx auto-gdd generate --no-scan
 
+# Fully non-interactive (CI / scripting)
+npx auto-gdd generate --yes \
+  --name "Dungeon Run" --genre roguelike --platform PC \
+  --concept "Procedural dungeon crawler with permadeath" \
+  --no-rag --no-scan
+
 # Split into separate Obsidian notes (one per section)
 npx auto-gdd generate --split
 
@@ -97,6 +108,11 @@ npx auto-gdd config --reset   # clear workspace config
 
 # List available Ollama models
 npx auto-gdd models
+
+# Set up shell tab completion
+eval "$(npx auto-gdd completions bash)"   # bash
+eval "$(npx auto-gdd completions zsh)"    # zsh
+npx auto-gdd completions fish > ~/.config/fish/completions/auto-gdd.fish
 ```
 
 Valid section keys: `overview` · `core_loop` · `mechanics` · `story` · `art_direction` · `audio` · `ui_ux` · `tech_specs` · `scope`
