@@ -301,7 +301,7 @@ export class WorkspaceScanner {
 
   // ── Tree builder ─────────────────────────────────────────────────────────────
 
-  private buildTree(maxDepth: number): string {
+  buildTree(maxDepth: number): string {
     const lines: string[] = [path.basename(this.root) + '/'];
 
     const walkForTree = (dir: string, depth: number, prefix: string): void => {

@@ -82,7 +82,7 @@ export class MarkdownWriter {
 
       if (opts.splitSections) {
         // Write each section as its own file
-        const sectionFileName = `${baseName} - ${section.title}.md`;
+        const sectionFileName = `${baseName} - ${sanitize(section.title)}.md`;
         const sectionPath = path.join(opts.outputDir, sectionFileName);
         const sectionLines = [
           `---`,

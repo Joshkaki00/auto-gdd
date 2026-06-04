@@ -109,4 +109,13 @@ export default [
       '@typescript-eslint/no-var-requires': 'off',
     },
   },
+
+  // ── Test file overrides ────────────────────────────────────────────────────
+  {
+    files: ['**/*.test.ts'],
+    rules: {
+      // vitest lives in root devDependencies — not repeated in each package
+      'import-x/no-extraneous-dependencies': 'off',
+    },
+  },
 ];
