@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // TODO(2026-07-28): bump @modelcontextprotocol/sdk when Tier-1 SDK ships
 // 2026-07-28 spec support. The SDK is expected to add first-class
 // server/discover, stateless _meta, and subscriptions/listen within

@@ -1,6 +1,7 @@
 # Auto-GDD
 
 [![npm version](https://img.shields.io/npm/v/auto-gdd)](https://www.npmjs.com/package/auto-gdd)
+[![npm downloads](https://img.shields.io/npm/dm/auto-gdd)](https://www.npmjs.com/package/auto-gdd)
 [![CI](https://github.com/auto-gdd/auto-gdd/actions/workflows/ci.yml/badge.svg)](https://github.com/auto-gdd/auto-gdd/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js ≥22](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
