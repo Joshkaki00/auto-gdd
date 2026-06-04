@@ -28,6 +28,7 @@ Local AI GDD generator. Offline-only. Never add cloud API calls.
 | Engine auto-detection | `packages/core/src/detector/WorkspaceDetector.ts` |
 | Config read/write | `packages/core/src/config/ConfigStore.ts` |
 | Cursor rules scaffolding | `packages/core/src/cursor/CursorScaffold.ts` |
+| Codebase scanner | `packages/core/src/scanner/WorkspaceScanner.ts` |
 | Vector store | `.auto-gdd-vectors/` (vectra, file-based, no server) |
 
 ### Key dependency notes
@@ -39,4 +40,5 @@ Local AI GDD generator. Offline-only. Never add cloud API calls.
 1. Add to `ENGINE_PROFILES` in `engineProfiles.ts`
 2. Add signature to `RULES` array in `WorkspaceDetector.ts`
 3. Add engine → context7 ID entry in `CursorScaffold.ts` (`ENGINE_CONTEXT7`)
-4. Add detection in `.cursor/hooks/workspace-open.js`
+4. Add source extension list to `ENGINE_SOURCE_EXTENSIONS` in `WorkspaceScanner.ts`
+5. Add detection in `.cursor/hooks/workspace-open.js`

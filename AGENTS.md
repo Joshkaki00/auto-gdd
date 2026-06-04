@@ -23,9 +23,10 @@ npm run lint:fix
 ## Run
 ```bash
 cd packages/cli && node dist/index.js doctor      # health check
-cd packages/cli && node dist/index.js init        # detect engine, write config + Cursor rules
-cd packages/cli && node dist/index.js generate    # full GDD
+cd packages/cli && node dist/index.js init        # detect engine, write config + Cursor rules + scan
+cd packages/cli && node dist/index.js generate    # full GDD (scans codebase first)
 cd packages/cli && node dist/index.js generate --section mechanics  # single section
+cd packages/cli && node dist/index.js generate --no-scan  # skip scan (empty projects)
 cd packages/mcp && node dist/index.js             # MCP server (Stdio)
 ```
 
@@ -49,6 +50,15 @@ cd packages/mcp && node dist/index.js             # MCP server (Stdio)
 ```json
 { "mcpServers": { "auto-gdd": { "command": "npx", "args": ["auto-gdd-mcp"] } } }
 ```
+
+## Codebase scanner safety model
+
+`WorkspaceScanner` in `packages/core/src/scanner/WorkspaceScanner.ts` performs a read-only static scan before GDD generation. The safety deny lists are **hardcoded and not overridable by users**:
+
+- Binary/image/audio/3D/archive extensions — never read
+- Credential patterns — `.env`, `*.key`, `*.pem`, `id_rsa`, lock files — never read
+- Generated dirs — `node_modules`, `.git`, `dist`, `Library`, `.godot`, `Binaries` — never entered
+- User-controllable exclusions go in `.auto-gdd-ignore` only (cannot undo the hardcoded denies)
 
 ## Upcoming
 - `TODO(2026-07-28)` in `packages/mcp/src/index.ts` — bump `@modelcontextprotocol/sdk` and replace hand-rolled `ServerDiscoverRequestSchema` once Tier-1 SDK ships 2026-07-28 spec support.

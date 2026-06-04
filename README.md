@@ -50,6 +50,21 @@ npx auto-gdd generate    # generate the GDD
 
 ---
 
+## How it grounds GDDs in your actual code
+
+When you run `auto-gdd generate`, it performs a read-only static scan of your project before calling Ollama. The scan:
+
+1. Walks your directory tree, collecting source files for your detected engine (`.gd` for Godot, `.cs` for Unity, `.rs` for Bevy, `.ts/.js` for web engines, etc.)
+2. Skips secrets, binaries, and generated dirs automatically — **no `.env`, `*.key`, `node_modules`, `Library/`, `.git/` etc. ever enter the context window**
+3. Extracts a directory tree and first-25-line preview of the key source files
+4. Injects this snapshot into Ollama's system prompt so every GDD section can reference real class names, file names, and existing systems
+
+The result: mechanics sections that match what you've actually built, tech specs that name real scripts, and scope estimates grounded in code you already have.
+
+Add a `.auto-gdd-ignore` file to exclude any additional paths (same format as `.gitignore`).
+
+---
+
 ## CLI Reference
 
 ```bash
@@ -69,6 +84,9 @@ npx auto-gdd generate --name "Neon Drift" --genre "top-down roguelite" --platfor
 # Regenerate specific section(s) only — merges into existing GDD file
 npx auto-gdd generate --section mechanics
 npx auto-gdd generate --section mechanics,story
+
+# Skip codebase scan (for empty/concept-stage projects)
+npx auto-gdd generate --no-scan
 
 # Split into separate Obsidian notes (one per section)
 npx auto-gdd generate --split
@@ -110,6 +128,19 @@ Good reference sources:
 - Game design articles (saved as `.md`)
 
 The embedding model (`nomic-embed-text:v1.5`) is pinned to avoid silent vector drift. If you change the model, re-index your entire library.
+
+### `.auto-gdd-ignore`
+
+Create this file in your project root to exclude paths from the codebase scan (same format as `.gitignore`):
+
+```
+# Don't scan generated UI code
+src/generated/
+# Don't scan vendor forks
+third_party/
+```
+
+Secrets, binaries, and common generated directories are always excluded regardless of this file.
 
 ---
 

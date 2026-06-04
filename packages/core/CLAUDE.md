@@ -47,6 +47,28 @@ Each profile has `mechanicsVocabulary` and `techSpecsHint` used to ground GDD se
 `src/gdd/MarkdownWriter.ts` — writes YAML frontmatter + wikilinks when `splitSections: true`.
   - `WriteOptions.sectionFilter?: string[]` — when set and the output file already exists, merges only those sections in-place rather than rewriting the whole document.
 
+## Codebase scanner
+
+`src/scanner/WorkspaceScanner.ts` — read-only static codebase scanner called at `init` and `generate` time.
+
+**Safety guarantees (hardcoded, not user-configurable):**
+- Never reads binary, image, audio, 3D asset, video, or archive files
+- Never reads credential/secret files (`.env`, `*.key`, `*.pem`, `id_rsa`, lock files…)
+- Never traverses generated directories (`node_modules`, `.git`, `dist`, `Library`, `.godot`, `Binaries`…)
+- Respects `.auto-gdd-ignore` (project-level extra exclusions, same format as `.gitignore`)
+- All operations are local — no network, no LLM at scan time
+
+**API:**
+```ts
+const scanner = new WorkspaceScanner(root, engineId);
+const result = scanner.scan();   // ScanResult
+const ctx = WorkspaceScanner.toContextString(result);  // Markdown block for LLM
+```
+
+`ScanResult` contains: `fileTree`, `languageBreakdown`, `keyFiles` (with first-25-line preview), `totalSourceFilesFound`, `ignoredCount`.
+
+`toContextString()` formats the result as a token-budgeted Markdown block (~2 000–3 000 tokens) injected into the GDD system prompt. Engine-specific source extensions are prioritized (e.g. `.gd` for Godot, `.cs` for Unity, `.rs` for Bevy).
+
 ## Cursor scaffolding
 
 `src/cursor/CursorScaffold.ts` — called by `auto-gdd init`.

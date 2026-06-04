@@ -83,6 +83,7 @@ Key ask rules: `git push`, `npm publish` — require explicit confirmation befor
 | Engine detection | `packages/core/src/detector/WorkspaceDetector.ts` |
 | Config read/write | `packages/core/src/config/ConfigStore.ts` |
 | Cursor rules scaffolding | `packages/core/src/cursor/CursorScaffold.ts` |
+| Codebase scanner | `packages/core/src/scanner/WorkspaceScanner.ts` |
 | RAG pipeline details | `packages/core/CLAUDE.md` |
 | Vector store | `.auto-gdd-vectors/` (vectra file-based, no server) |
 
